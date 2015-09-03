@@ -1,0 +1,35 @@
+{
+    "variables": {
+        "version": "",
+        "jdk7-base-image-version": "",
+        "app_destination": "",
+        "app_binary_url": "",
+        "app_conf_url": ""
+    },
+    "builders":[{
+        "type": "docker",
+        "image": "rpaturu/jdk7-base:{{user `jdk7-base-image-version`}}",
+        "pull": true,
+        "commit": true
+    }],
+    "provisioners":[
+        {
+            "type": "ansible-local",
+            "playbook_file": "playbooks/local.yml",
+            "role_paths":[
+                "roles/sample-app"
+            ],
+            "extra_arguments":[
+                "--extra-vars 'app_destination={{user `app_destination`}} app_binary_url={{user `app_binary_url`}} app_conf_url={{user `app_conf_url`}} version={{user `version`}}'"
+            ]
+        }
+    ],
+    "post-processors": [
+        {
+            "type": "docker-tag",
+            "repository": "rpaturu/sample-app",
+            "tag": "{{user `version`}}",
+            "force": true
+        }
+    ]
+}
